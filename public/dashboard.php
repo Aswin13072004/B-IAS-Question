@@ -2,22 +2,22 @@
 include '../config/db_config.php';
 
 // Check if the user is logged in
-if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
+if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
     header("location: index.php");
     exit;
 }
 
 // Handle test creation
-if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["create_test"])){
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["create_test"])) {
     $test_name = trim($_POST["test_name"]);
-    
-    if(!empty($test_name)){
+
+    if (!empty($test_name)) {
         $sql = "INSERT INTO tests (test_name, created_by) VALUES (?, ?)";
-        
-        if($stmt = mysqli_prepare($conn, $sql)){
+
+        if ($stmt = mysqli_prepare($conn, $sql)) {
             mysqli_stmt_bind_param($stmt, "si", $test_name, $_SESSION["id"]);
-            
-            if(mysqli_stmt_execute($stmt)){
+
+            if (mysqli_stmt_execute($stmt)) {
                 $test_id = mysqli_insert_id($conn);
                 header("location: manage_test.php?test_id=" . $test_id);
                 exit;
@@ -29,14 +29,28 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["create_test"])){
     }
 }
 
+// Handle delete
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["delete_test"])) {
+    $test_id = intval($_POST["delete_test_id"]);
+    $sql = "DELETE FROM tests WHERE test_id = ? AND created_by = ?";
+    if ($stmt = mysqli_prepare($conn, $sql)) {
+        mysqli_stmt_bind_param($stmt, "ii", $test_id, $_SESSION["id"]);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
+    }
+    header("location: dashboard.php");
+    exit;
+}
+
+
 // Fetch all tests created by this staff member
 $tests = [];
 $sql = "SELECT * FROM tests WHERE created_by = ? ORDER BY created_at DESC";
-if($stmt = mysqli_prepare($conn, $sql)){
+if ($stmt = mysqli_prepare($conn, $sql)) {
     mysqli_stmt_bind_param($stmt, "i", $_SESSION["id"]);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
-    while($row = mysqli_fetch_assoc($result)){
+    while ($row = mysqli_fetch_assoc($result)) {
         $tests[] = $row;
     }
     mysqli_stmt_close($stmt);
@@ -45,6 +59,7 @@ if($stmt = mysqli_prepare($conn, $sql)){
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -61,29 +76,29 @@ if($stmt = mysqli_prepare($conn, $sql)){
             --success-color: #2ecc71;
             --warning-color: #f39c12;
         }
-        
+
         body {
             background-color: #f5f7fa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         .navbar-brand {
             font-weight: 700;
             font-size: 1.5rem;
             letter-spacing: 0.5px;
         }
-        
+
         .navbar-brand img {
             height: 40px;
             margin-right: 10px;
         }
-        
+
         .page-header {
-            border-bottom: 1px solid rgba(0,0,0,0.1);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
             padding-bottom: 1rem;
             margin-bottom: 2rem;
         }
-        
+
         .card {
             border: none;
             border-radius: 12px;
@@ -91,12 +106,12 @@ if($stmt = mysqli_prepare($conn, $sql)){
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             margin-bottom: 1.5rem;
         }
-        
+
         .card:hover {
             transform: translateY(-5px);
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
         }
-        
+
         .card-header {
             background-color: var(--primary-color);
             color: white;
@@ -104,31 +119,39 @@ if($stmt = mysqli_prepare($conn, $sql)){
             padding: 1.25rem 1.5rem;
             font-weight: 600;
         }
-        
+
         .card-body {
             padding: 1.5rem;
         }
-        
+
         .test-card {
-            border-left: 4px solid var(--secondary-color);
+            background: linear-gradient(135deg, #ecf0f1, #e3f2fd);
+            border-left: 6px solid var(--secondary-color);
+            border-radius: 15px;
+            transition: all 0.3s ease-in-out;
         }
-        
+
+        .test-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 20px rgba(52, 152, 219, 0.2);
+        }
+
         .test-card .card-title {
             font-weight: 600;
             color: var(--primary-color);
             margin-bottom: 0.75rem;
         }
-        
+
         .test-card .card-text {
             color: #6c757d;
             font-size: 0.9rem;
         }
-        
+
         .test-card .meta {
             font-size: 0.85rem;
             color: #6c757d;
         }
-        
+
         .btn-action {
             border-radius: 6px;
             padding: 0.375rem 0.75rem;
@@ -137,68 +160,68 @@ if($stmt = mysqli_prepare($conn, $sql)){
             margin-right: 0.5rem;
             margin-bottom: 0.5rem;
         }
-        
+
         .btn-primary {
             background-color: var(--secondary-color);
             border-color: var(--secondary-color);
         }
-        
+
         .btn-primary:hover {
             background-color: #2980b9;
             border-color: #2980b9;
         }
-        
+
         .btn-edit {
             background-color: #3498db;
             border-color: #3498db;
         }
-        
+
         .btn-view {
             background-color: var(--success-color);
             border-color: var(--success-color);
         }
-        
+
         .btn-delete {
             background-color: var(--accent-color);
             border-color: var(--accent-color);
         }
-        
+
         .btn-manage {
             background-color: var(--warning-color);
             border-color: var(--warning-color);
             color: white;
         }
-        
+
         .badge-count {
             background-color: var(--secondary-color);
             font-size: 0.9rem;
             font-weight: 500;
             padding: 0.35em 0.65em;
         }
-        
+
         .empty-state {
             text-align: center;
             padding: 3rem;
             color: #6c757d;
         }
-        
+
         .empty-state-icon {
             font-size: 4rem;
             color: #dee2e6;
             margin-bottom: 1rem;
         }
-        
+
         .stats-card {
             border-left: 4px solid var(--secondary-color);
             margin-bottom: 1.5rem;
         }
-        
+
         .stats-card .stat-value {
             font-size: 1.75rem;
             font-weight: 700;
             color: var(--primary-color);
         }
-        
+
         .stats-card .stat-label {
             font-size: 0.9rem;
             color: #6c757d;
@@ -207,6 +230,7 @@ if($stmt = mysqli_prepare($conn, $sql)){
         }
     </style>
 </head>
+
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4 shadow-sm">
         <div class="container">
@@ -275,7 +299,7 @@ if($stmt = mysqli_prepare($conn, $sql)){
                         <span class="badge badge-count"><?php echo count($tests); ?> Tests</span>
                     </div>
                     <div class="card-body">
-                        <?php if(empty($tests)): ?>
+                        <?php if (empty($tests)): ?>
                             <div class="empty-state">
                                 <div class="empty-state-icon">
                                     <i class="bi bi-journal-x"></i>
@@ -288,27 +312,35 @@ if($stmt = mysqli_prepare($conn, $sql)){
                             </div>
                         <?php else: ?>
                             <div class="row">
-                                <?php foreach($tests as $test): ?>
-                                <div class="col-md-6 col-lg-6">
-                                    <div class="card test-card h-100">
-                                        <div class="card-body">
-                                            <h5 class="card-title"><?php echo htmlspecialchars($test['test_name']); ?></h5>
-                                            <div class="meta mb-3">
-                                                <span class="me-3"><i class="bi bi-calendar me-1"></i> <?php echo date("M d, Y", strtotime($test['created_at'])); ?></span>
-                                                <span><i class="bi bi-arrow-repeat me-1"></i> <?php echo date("M d, Y", strtotime($test['updated_at'])); ?></span>
-                                            </div>
-                                            <div class="d-flex flex-wrap">
-                                                <a href="manage_test.php?test_id=<?php echo $test['test_id']; ?>" class="btn btn-sm btn-action btn-manage">
-                                                    <i class="bi bi-pencil-square"></i> Manage Questions
-                                                </a>
-                                                <a href="view_test.php?test_id=<?php echo $test['test_id']; ?>" class="btn btn-sm btn-action btn-view">
-                                                    <i class="bi bi-eye"></i> Attend Test
-                                                </a>
-                                                
+                                <?php foreach ($tests as $test): ?>
+                                    <div class="col-md-6 col-lg-6">
+                                        <div class="card test-card h-100 shadow-sm border-0" style="background: linear-gradient(135deg, #f5f7fa, #dbe9f4);">
+                                            <div class="card-body">
+                                                <h5 class="card-title text-primary"><?php echo htmlspecialchars($test['test_name']); ?></h5>
+                                                <div class="meta mb-3">
+                                                    <span class="me-3"><i class="bi bi-calendar me-1"></i> <?php echo date("M d, Y", strtotime($test['created_at'])); ?></span>
+                                                    <span><i class="bi bi-arrow-repeat me-1"></i> <?php echo date("M d, Y", strtotime($test['updated_at'])); ?></span>
+                                                </div>
+                                                <div class="d-flex flex-wrap">
+                                                    <a href="manage_test.php?test_id=<?php echo $test['test_id']; ?>" class="btn btn-sm btn-action btn-manage">
+                                                        <i class="bi bi-pencil-square"></i> Manage Questions
+                                                    </a>
+                                                    <a href="view_test.php?test_id=<?php echo $test['test_id']; ?>" class="btn btn-sm btn-action btn-view">
+                                                        <i class="bi bi-eye"></i> Attend Test
+                                                    </a>
+
+
+                                                    <form method="POST" onsubmit="return confirm('Are you sure you want to delete this test?');" style="display:inline;">
+                                                        <input type="hidden" name="delete_test_id" value="<?php echo $test['test_id']; ?>">
+                                                        <button type="submit" name="delete_test" class="btn btn-sm btn-action btn-delete">
+                                                            <i class="bi bi-trash"></i> Delete
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+
                                 <?php endforeach; ?>
                             </div>
                         <?php endif; ?>
@@ -317,6 +349,8 @@ if($stmt = mysqli_prepare($conn, $sql)){
             </div>
         </div>
     </div>
+    <!-- Edit Test Modal -->
+
 
     <!-- Create Test Modal -->
     <div class="modal fade" id="createTestModal" tabindex="-1" aria-labelledby="createTestModalLabel" aria-hidden="true">
@@ -343,10 +377,11 @@ if($stmt = mysqli_prepare($conn, $sql)){
         </div>
     </div>
 
-   
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
+
 </body>
+
 </html>
