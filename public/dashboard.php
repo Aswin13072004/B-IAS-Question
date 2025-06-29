@@ -42,6 +42,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["delete_test"])) {
     exit;
 }
 
+// Handle rename
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["rename_test"])) {
+    $test_id = intval($_POST["rename_test_id"]);
+    $new_test_name = trim($_POST["new_test_name"]);
+    
+    if (!empty($new_test_name)) {
+        $sql = "UPDATE tests SET test_name = ? WHERE test_id = ? AND created_by = ?";
+        if ($stmt = mysqli_prepare($conn, $sql)) {
+            mysqli_stmt_bind_param($stmt, "sii", $new_test_name, $test_id, $_SESSION["id"]);
+            mysqli_stmt_execute($stmt);
+            mysqli_stmt_close($stmt);
+        }
+    }
+    header("location: dashboard.php");
+    exit;
+}
 
 // Fetch all tests created by this staff member
 $tests = [];
@@ -192,6 +208,12 @@ if ($stmt = mysqli_prepare($conn, $sql)) {
             color: white;
         }
 
+        .btn-rename {
+            background-color: #9b59b6;
+            border-color: #9b59b6;
+            color: white;
+        }
+
         .badge-count {
             background-color: var(--secondary-color);
             font-size: 0.9rem;
@@ -328,8 +350,10 @@ if ($stmt = mysqli_prepare($conn, $sql)) {
                                                     <a href="view_test.php?test_id=<?php echo $test['test_id']; ?>" class="btn btn-sm btn-action btn-view">
                                                         <i class="bi bi-eye"></i> Attend Test
                                                     </a>
-
-
+                                                    <button class="btn btn-sm btn-action btn-rename" data-bs-toggle="modal" data-bs-target="#renameTestModal" 
+                                                        data-test-id="<?php echo $test['test_id']; ?>" data-test-name="<?php echo htmlspecialchars($test['test_name']); ?>">
+                                                        <i class="bi bi-pencil"></i> Rename
+                                                    </button>
                                                     <form method="POST" onsubmit="return confirm('Are you sure you want to delete this test?');" style="display:inline;">
                                                         <input type="hidden" name="delete_test_id" value="<?php echo $test['test_id']; ?>">
                                                         <button type="submit" name="delete_test" class="btn btn-sm btn-action btn-delete">
@@ -340,7 +364,6 @@ if ($stmt = mysqli_prepare($conn, $sql)) {
                                             </div>
                                         </div>
                                     </div>
-
                                 <?php endforeach; ?>
                             </div>
                         <?php endif; ?>
@@ -349,8 +372,6 @@ if ($stmt = mysqli_prepare($conn, $sql)) {
             </div>
         </div>
     </div>
-    <!-- Edit Test Modal -->
-
 
     <!-- Create Test Modal -->
     <div class="modal fade" id="createTestModal" tabindex="-1" aria-labelledby="createTestModalLabel" aria-hidden="true">
@@ -377,11 +398,46 @@ if ($stmt = mysqli_prepare($conn, $sql)) {
         </div>
     </div>
 
-
+    <!-- Rename Test Modal -->
+    <div class="modal fade" id="renameTestModal" tabindex="-1" aria-labelledby="renameTestModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="renameTestModalLabel"><i class="bi bi-pencil me-2"></i>Rename Test</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST" action="">
+                    <div class="modal-body">
+                        <input type="hidden" name="rename_test_id" id="rename_test_id" value="">
+                        <div class="mb-3">
+                            <label for="new_test_name" class="form-label">New Test Name</label>
+                            <input type="text" class="form-control" id="new_test_name" name="new_test_name" placeholder="Enter new test name" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" name="rename_test" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+    <script>
+        // Handle the rename modal opening
+        $(document).ready(function() {
+            $('#renameTestModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget); // Button that triggered the modal
+                var testId = button.data('test-id'); // Extract info from data-* attributes
+                var testName = button.data('test-name');
+                
+                var modal = $(this);
+                modal.find('#rename_test_id').val(testId);
+                modal.find('#new_test_name').val(testName);
+            });
+        });
+    </script>
 </body>
-
 </html>
