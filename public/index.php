@@ -93,6 +93,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     <title>Brilliant IAS Academy - Staff Login</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../assets/style.css">
+        <link rel="icon" href="../assets/logo.jpg" type="image/x-icon">
+
 </head>
 <body>
     <div class="container">

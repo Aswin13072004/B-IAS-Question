@@ -140,6 +140,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WIT
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="style.css">
+        <link rel="icon" href="../assets/logo.jpg" type="image/x-icon">
+
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
