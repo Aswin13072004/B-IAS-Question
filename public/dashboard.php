@@ -289,7 +289,7 @@ if($stmt = mysqli_prepare($conn, $sql)){
                         <?php else: ?>
                             <div class="row">
                                 <?php foreach($tests as $test): ?>
-                                <div class="col-md-6 col-lg-4">
+                                <div class="col-md-6 col-lg-6">
                                     <div class="card test-card h-100">
                                         <div class="card-body">
                                             <h5 class="card-title"><?php echo htmlspecialchars($test['test_name']); ?></h5>
@@ -299,17 +299,12 @@ if($stmt = mysqli_prepare($conn, $sql)){
                                             </div>
                                             <div class="d-flex flex-wrap">
                                                 <a href="manage_test.php?test_id=<?php echo $test['test_id']; ?>" class="btn btn-sm btn-action btn-manage">
-                                                    <i class="bi bi-pencil-square"></i> Manage
+                                                    <i class="bi bi-pencil-square"></i> Manage Questions
                                                 </a>
                                                 <a href="view_test.php?test_id=<?php echo $test['test_id']; ?>" class="btn btn-sm btn-action btn-view">
-                                                    <i class="bi bi-eye"></i> View
+                                                    <i class="bi bi-eye"></i> Attend Test
                                                 </a>
-                                                <button class="btn btn-sm btn-action btn-edit" data-bs-toggle="modal" data-bs-target="#editTestModal" data-id="<?php echo $test['test_id']; ?>" data-name="<?php echo htmlspecialchars($test['test_name']); ?>">
-                                                    <i class="bi bi-pencil-square"></i> Edit
-                                                </button>
-                                                <button class="btn btn-sm btn-action btn-delete delete-test" data-id="<?php echo $test['test_id']; ?>">
-                                                    <i class="bi bi-trash"></i> Delete
-                                                </button>
+                                                
                                             </div>
                                         </div>
                                     </div>
@@ -348,61 +343,10 @@ if($stmt = mysqli_prepare($conn, $sql)){
         </div>
     </div>
 
-    <!-- Edit Test Modal -->
-    <div class="modal fade" id="editTestModal" tabindex="-1" aria-labelledby="editTestModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title" id="editTestModalLabel"><i class="bi bi-pencil-square me-2"></i>Edit Test</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form id="editTestForm" method="POST" action="update_test.php">
-                    <input type="hidden" id="edit_test_id" name="test_id">
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="edit_test_name" class="form-label">Test Name</label>
-                            <input type="text" class="form-control" id="edit_test_name" name="test_name" required>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Save Changes</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+   
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-    $(document).ready(function(){
-        // Handle edit button click
-        $('.btn-edit').click(function(){
-            const testId = $(this).data('id');
-            const testName = $(this).data('name');
-            
-            $('#edit_test_id').val(testId);
-            $('#edit_test_name').val(testName);
-        });
-        
-        // Handle delete button click
-        $('.delete-test').click(function(){
-            const testId = $(this).data('id');
-            if(confirm('Are you sure you want to delete this test? All associated questions and results will be permanently deleted.')){
-                // AJAX call to delete test
-                $.post('delete_test.php', {test_id: testId}, function(response){
-                    if(response.success){
-                        location.reload();
-                    } else {
-                        alert('Error: ' + response.error);
-                    }
-                }).fail(function(){
-                    alert('An error occurred while deleting the test.');
-                });
-            }
-        });
-    });
-    </script>
+    
 </body>
 </html>
