@@ -192,6 +192,9 @@
             font-size: 1.5rem;
             color: white;
         }
+        .bg-primary {
+            background: var(--gradient-primary);
+        }
 
         .stats-icon.primary {
             background: var(--gradient-success);
@@ -407,6 +410,9 @@
         .form-control:focus {
             border-color: var(--secondary-color);
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        .text-success {
+            color:  var(--success-color) !important;
         }
 
         /* Responsive Design */

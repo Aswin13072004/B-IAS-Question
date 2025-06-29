@@ -224,7 +224,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WIT
                         </div>
                     </div>
                     <div class="d-grid mt-3">
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-warning">
                             <i class="bi bi-plus-circle me-1"></i> Add Question
                         </button>
                     </div>
