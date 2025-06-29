@@ -139,30 +139,24 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WIT
     <title>Manage Test - Brilliant IAS Academy</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="style.css">
+    <!-- <link rel="stylesheet" href="../assets/style.css"> -->
+    <link rel="stylesheet" href="../assets/dashboard.css">
         <link rel="icon" href="../assets/logo.jpg" type="image/x-icon">
+
 
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+     <nav class="navbar navbar-expand-lg navbar-dark mb-4">
         <div class="container">
-            <a class="navbar-brand" href="dashboard.php">Brilliant IAS Academy</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-person-circle me-1"></i> <?php echo htmlspecialchars($_SESSION["name"]); ?>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="dashboard.php"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="logout.php"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
-                        </ul>
-                    </li>
-                </ul>
+            <a class="navbar-brand d-flex align-items-center" href="dashboard.php">
+                <img src="../assets/logo.jpg" alt="Brilliant IAS Academy Logo">
+                Brilliant IAS Academy
+            </a>
+            <div class="d-flex align-items-center">
+                <span class="text-white me-3 d-none d-md-inline">Welcome back!</span>
+                <a href="logout.php" class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-box-arrow-right me-1"></i> Logout
+                </a>
             </div>
         </div>
     </nav>
